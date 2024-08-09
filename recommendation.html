@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movies Recommendation System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+        }
+        input, button {
+            padding: 10px;
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Movie Recommendation System</h2>
+        <label for="userProfile">Enter User Profile (comma-separated values):</label>
+        <input type="text" id="userProfile" placeholder="e.g., 0.5,0.5,0.5">
+        <button onclick="getRecommendations()">Get Recommendations</button>
+
+        <h3>Recommendations:</h3>
+        <ul id="recommendationsList"></ul>
+    </div>
+
+    <script>
+        // Example item features (rows are items, columns are features)
+        const itemFeatures = [
+            [1.0, 0.5, 0.2], // Item 0
+            [0.8, 0.6, 0.3], // Item 1
+            [0.4, 0.2, 0.7], // Item 2
+            [0.7, 0.9, 0.1]  // Item 3
+        ];
+
+        function euclideanDistance(a, b) {
+            return Math.sqrt(a.reduce((sum, val, i) => sum + Math.pow(val - b[i], 2), 0));
+        }
+
+        function getRecommendations() {
+            const userProfileInput = document.getElementById('userProfile').value;
+            const userProfile = userProfileInput.split(',').map(Number);
+
+            const numRecommendations = 2;
+
+            const distances = itemFeatures.map((features, index) => ({
+                distance: euclideanDistance(features, userProfile),
+                index
+            }));
+
+            distances.sort((a, b) => a.distance - b.distance);
+
+            const recommendations = distances.slice(0, numRecommendations).map(item => item.index);
+
+            displayRecommendations(recommendations);
+        }
+
+        function displayRecommendations(recommendations) {
+            const recommendationsList = document.getElementById('recommendationsList');
+            recommendationsList.innerHTML = '';
+
+            recommendations.forEach(item => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `Item ${item}`;
+                recommendationsList.appendChild(listItem);
+            });
+        }
+    </script>
+</body>
+</html>

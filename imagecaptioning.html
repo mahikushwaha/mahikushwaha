@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Captioning</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        input[type="file"] {
+            margin-bottom: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Captioning AI</h1>
+    <input type="file" id="imageUpload" accept="image/*">
+    <button onclick="generateCaption()">Generate Caption</button>
+    <div id="result">
+        <img id="uploadedImage" src="" alt="Uploaded Image">
+        <p id="caption"></p>
+    </div>
+
+    <script>
+        let model;
+
+        // Load MobileNet model
+        async function loadModel() {
+            model = await mobilenet.load();
+            console.log("Model loaded");
+        }
+
+        // Generate caption for the uploaded image
+        async function generateCaption() {
+            const fileInput = document.getElementById('imageUpload');
+            const image = document.getElementById('uploadedImage');
+            const captionElement = document.getElementById('caption');
+            
+            if (fileInput.files.length === 0) {
+                alert('Please upload an image first.');
+                return;
+            }
+
+            // Set image source
+            const file = fileInput.files[0];
+            image.src = URL.createObjectURL(file);
+            
+            // Wait for image to load
+            image.onload = async () => {
+                // Predict the image
+                const predictions = await model.classify(image);
+
+                // Display the top prediction as caption
+                if (predictions.length > 0) {
+                    captionElement.innerText = `Caption: ${predictions[0].className}`;
+                } else {
+                    captionElement.innerText = 'Could not generate a caption.';
+                }
+            };
+        }
+
+        // Load model on page load
+        loadModel();
+    </script>
+</body>
+</html>
